@@ -1,0 +1,11 @@
+{
+  "name": "Red Light, Green Light Game",
+  "short_name": "Light Game",
+  "description": "Full-screen traffic light game with unpredictable auto mode.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#13a538",
+  "theme_color": "#13a538",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
