@@ -1,56 +1,48 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#13a538" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Light Game" />
-  <meta name="description" content="A full-screen red, yellow, green light game with manual and unpredictable auto modes." />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <title>Red Light, Green Light</title>
-  <style>
-    :root { font-family: system-ui, -apple-system, sans-serif; color-scheme: dark; }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-    body { background: #13a538; }
-    #screen { position: fixed; inset: 0; background: #13a538; display: flex; align-items: center; justify-content: center; transition: background-color .12s linear; }
-    #word { font-size: clamp(4rem, 17vw, 14rem); line-height: 1; font-weight: 1000; letter-spacing: -.06em; color: white; text-shadow: 0 4px 20px #0005; pointer-events: none; user-select: none; }
-    #screen.yellow #word { color: #171717; text-shadow: none; }
-    #toolbar { position: fixed; z-index: 5; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(96%, 580px); padding: 16px; background: rgba(18, 23, 30, .93); border: 1px solid #ffffff3b; border-radius: 22px; color: #fff; box-shadow: 0 10px 35px #0005; transition: opacity .2s, transform .2s; }
-    #toolbar.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
-    .row { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
-    button { border: 0; border-radius: 12px; min-height: 48px; padding: 10px 15px; font-size: 16px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
-    .color { flex: 1; min-width: 75px; }
-    .red { background: #ed3131; color: #fff; } .yellow { background: #ffdc24; color: #111; } .green { background: #15b34a; color: #fff; }
-    .utility { background: #e7ebf0; color: #171b20; } .utility.active { background: #9dd5ff; }
-    .row + .row { margin-top: 10px; }
-    .setting { margin-top: 12px; display: flex; align-items: center; gap: 10px; font-size: 14px; justify-content: space-between; }
-    input[type=range] { flex: 1; min-width: 80px; accent-color: #9dd5ff; }
-    #hint { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top)); left: 0; right: 0; text-align: center; color: #fff; font-size: 14px; font-weight: 650; opacity: .75; pointer-events: none; text-shadow: 0 1px 3px #0008; transition: opacity .2s; }
-    #hint.gone { opacity: 0; }
-    button:focus-visible, input:focus-visible { outline: 3px solid white; outline-offset: 3px; }
-    @media (max-height: 450px) { #toolbar { padding: 9px; bottom: 8px; } button { min-height: 38px; padding: 6px 10px; } .setting { margin-top: 6px; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08bd46">
+<title>Red Light, Green Light</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark;background:#111827;color:#fff}*{box-sizing:border-box}body{margin:0}.app{max-width:1000px;margin:auto;padding:16px;display:grid;gap:12px}.toolbar,.choices,.auto-actions{display:flex;gap:10px;align-items:center}button{font:inherit;font-weight:650;border:1px solid #526073;border-radius:12px;padding:12px 16px;background:#263244;color:white;cursor:pointer;touch-action:manipulation}button:focus-visible,#screen:focus-visible{outline:3px solid white;outline-offset:3px}button[aria-pressed=true]{background:#53657e;border-color:#d4dce8}.toolbar button{flex:1}#screen{background:#08bd46;height:70dvh;min-height:300px;width:100%;border-radius:14px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}#screen:fullscreen{width:100vw;height:100dvh;min-height:0;border-radius:0}#screen:-webkit-full-screen{width:100vw;height:100vh;border-radius:0}.choices button,.auto-actions button{flex:1}.choices button{border:0}.green{background:#08bd46}.yellow{background:#ffda16;color:#111}.red{background:#f02424}.auto-panel{display:grid;gap:12px}.timing{display:flex;justify-content:space-between;gap:10px}input[type=range]{width:100%;accent-color:#08bd46}#fullscreen{width:100%}.note{color:#b7c1d1;font-size:13px;text-align:center;margin:0}[hidden]{display:none!important}@media(max-width:500px){.app{padding:10px}#screen{height:73dvh}.toolbar,.choices,.auto-actions{gap:6px}button{padding:12px 8px}}
+</style>
 </head>
 <body>
-  <main id="screen" role="img" aria-label="Green light"><div id="word">GO!</div></main>
-  <div id="hint">Tap anywhere to show or hide controls</div>
-  <section id="toolbar" aria-label="Game controls">
-    <div class="row">
-      <button class="color red" data-color="red">RED</button>
-      <button class="color yellow" data-color="yellow">YELLOW</button>
-      <button class="color green" data-color="green">GREEN</button>
-    </div>
-    <div class="row">
-      <button id="auto" class="utility" aria-pressed="false">▶ Start Auto</button>
-      <button id="fullscreen" class="utility">⛶ Full Screen</button>
-      <button id="hide" class="utility">Hide Controls</button>
-    </div>
-    <label class="setting" for="speed"><span>Change frequency</span><input id="speed" type="range" min="1" max="5" value="3" step="1" /><span id="speedLabel">Normal</span></label>
-  </section>
-  <script src="script.js" defer></script>
+<main class="app">
+<div class="toolbar" aria-label="Game mode"><button id="manual" aria-pressed="true">Manual</button><button id="auto" aria-pressed="false">Auto</button></div>
+<div id="screen" role="button" tabindex="0" aria-label="Traffic light. Click or press Space to advance."></div>
+<div class="choices" id="manualControls"><button class="green" data-index="0">Green</button><button class="yellow" data-index="1">Yellow</button><button class="red" data-index="2">Red</button></div>
+<div id="autoControls" class="auto-panel" hidden><div class="timing"><label for="speed">Random change interval</label><output id="speedLabel">2–6 seconds</output></div><input type="range" id="speed" min="0" max="3" step="1" value="1"><div class="auto-actions"><button id="start" class="green">Start Auto</button><button id="stop" disabled>Stop</button></div></div>
+<button id="fullscreen">Full Screen</button><p class="note">Manual: click, tap, or press Space. Esc exits full screen.</p>
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const screen=$('screen');
+const colors=['#08bd46','#ffda16','#f02424'];
+const intervals=[[700,2000],[2000,6000],[4000,10000],[7000,16000]];
+const labels=['0.7–2 seconds','2–6 seconds','4–10 seconds','7–16 seconds'];
+let index=0,mode='manual',running=false,timer=null;
+function show(next){index=next;screen.style.backgroundColor=colors[index];document.querySelector('meta[name="theme-color"]').content=colors[index];}
+function advance(){if(mode==='manual')show((index+1)%3);}
+function stop(){running=false;clearTimeout(timer);timer=null;$('start').disabled=false;$('stop').disabled=true;}
+function schedule(){if(!running)return;const [min,max]=intervals[Number($('speed').value)];timer=setTimeout(()=>{if(!running)return;const options=[0,1,2].filter(n=>n!==index);show(options[Math.floor(Math.random()*options.length)]);schedule();},min+Math.random()*(max-min));}
+function setMode(next){stop();mode=next;$('manual').setAttribute('aria-pressed',String(next==='manual'));$('auto').setAttribute('aria-pressed',String(next==='auto'));$('manualControls').hidden=next!=='manual';$('autoControls').hidden=next!=='auto';}
+$('manual').addEventListener('click',()=>setMode('manual'));
+$('auto').addEventListener('click',()=>setMode('auto'));
+screen.addEventListener('click',advance);
+document.querySelectorAll('[data-index]').forEach(button=>button.addEventListener('click',()=>show(Number(button.dataset.index))));
+$('start').addEventListener('click',()=>{if(running)return;running=true;$('start').disabled=true;$('stop').disabled=false;schedule();});
+$('stop').addEventListener('click',stop);
+$('speed').addEventListener('input',()=>{$('speedLabel').textContent=labels[Number($('speed').value)];if(running){clearTimeout(timer);schedule();}});
+$('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement){await document.exitFullscreen();}else if(screen.requestFullscreen){await screen.requestFullscreen();}else{alert('Full screen is not supported in this browser.');}}catch(e){alert('Your browser did not allow full screen. Try opening the site directly in your browser.');}});
+document.addEventListener('keydown',event=>{if(event.code!=='Space'||event.repeat||mode!=='manual'||event.altKey||event.ctrlKey||event.metaKey)return;const target=event.target;if(target instanceof Element&&target.closest('button,input,select,textarea,[contenteditable="true"]'))return;event.preventDefault();advance();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running)stop();});
+show(0);
+})();
+</script>
 </body>
 </html>
